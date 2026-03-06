@@ -14,13 +14,20 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
+# Enable Apache rewrite
 RUN a2enmod rewrite
 
-# IMPORTANT: Change Apache root to Laravel public folder
+# Change Apache root to Laravel public folder
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+
+# Allow .htaccess
+RUN echo "<Directory /var/www/html/public>\n\
+AllowOverride All\n\
+Require all granted\n\
+</Directory>" >> /etc/apache2/apache2.conf
 
 RUN chown -R www-data:www-data /var/www/html
 
