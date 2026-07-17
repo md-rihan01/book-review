@@ -11,9 +11,16 @@ class Book extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['title', 'author_name', 'author_id'];
+
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'author_id');
     }
 
     public function scopeTitle(Builder $query, string $title): Builder
@@ -49,7 +56,7 @@ class Book extends Model
 
     public function scopeMinReviews(Builder $query, int $minReviews): Builder|QueryBuilder
     {
-        return $query->where('reviews_count', '>=', $minReviews);
+        return $query->having('reviews_count', '>=', $minReviews);
     }
 
     private function dateRangeFilter(Builder $query, $from = null, $to = null)
@@ -93,11 +100,15 @@ class Book extends Model
 
     protected static function booted()
     {
-        static::updated(
-            fn(Book $book) => cache()->forget('book:' . $book->id)
-        );
-        static::deleted(
-            fn(Book $book) => cache()->forget('book:' . $book->id)
-        );
+        $bustListing = fn() => cache()->increment('books_listing_version');
+
+        static::updated(function (Book $book) use ($bustListing) {
+            cache()->forget('book:' . $book->id);
+            $bustListing();
+        });
+        static::deleted(function (Book $book) use ($bustListing) {
+            cache()->forget('book:' . $book->id);
+            $bustListing();
+        });
     }
 }

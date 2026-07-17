@@ -9,18 +9,24 @@
 
         <div class="mb-3">
             <label for="review" class="form-label fw-semibold">Review</label>
-            <textarea name="review" id="review" class="form-control" rows="4" placeholder="Write your review here..."
-                required></textarea>
+            <textarea name="review" id="review" class="form-control @error('review') is-invalid @enderror" rows="4"
+                placeholder="Write your review here..." required>{{ old('review') }}</textarea>
+            @error('review')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
         <div class="mb-3">
             <label for="rating" class="form-label fw-semibold">Rating</label>
-            <select name="rating" id="rating" class="form-select" required>
+            <select name="rating" id="rating" class="form-select @error('rating') is-invalid @enderror" required>
                 <option value="">Select a Rating</option>
                 @for ($i = 1; $i <= 5; $i++)
-                    <option value="{{ $i }}">{{ $i }}</option>
+                    <option value="{{ $i }}" {{ old('rating') == $i ? 'selected' : '' }}>{{ $i }}</option>
                 @endfor
             </select>
+            @error('rating')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
         <div>

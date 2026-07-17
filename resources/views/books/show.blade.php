@@ -2,10 +2,10 @@
 
 @section('content')
     <div class="mb-4">
-        <h1 class="sticky-top mb-2 fs-2">{{ $book->title }}</h1>
+        <h1 class="mb-2 fs-2">{{ $book->title }}</h1>
 
         <div class="book-info">
-            <div class="book-author mb-3 fw-semibold fs-5">by {{ $book->author }}</div>
+            <div class="book-author mb-3 fw-semibold fs-5">by {{ $book->author_name }}</div>
             <div class="book-rating d-flex align-items-center">
                 <div class="me-2 text-secondary fw-medium">
                     {{-- {{ number_format($book->reviews_avg_rating, 1) }} --}}
@@ -18,15 +18,26 @@
         </div>
     </div>
 
-    <div class="mb-4">
-        <a href="{{ route('books.reviews.create', $book) }}" class="reset-link">
-            Add a review!</a>
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            @auth
+                <a href="{{ route('books.reviews.create', $book) }}" class="reset-link">
+                    Add a review!</a>
+            @else
+                <a href="{{ route('auth.login', ['redirect_to' => $book->id]) }}" class="reset-link">
+                    Add a review!</a>
+            @endauth
+        </div>
+        <div>
+            <a href="{{ route('books.index') }}" class="reset-link">
+                Back to Books</a>
+        </div>
     </div>
 
     <div>
         <h2 class="mb-3 fs-4 fw-semibold">Reviews</h2>
         <ul class="list-unstyled">
-            @forelse ($book->reviews as $review)
+            @forelse ($reviews as $review)
                 <li class="book-item mb-3">
                     <div>
                         <div class="d-flex justify-content-between mb-2">
@@ -46,5 +57,9 @@
                 </li>
             @endforelse
         </ul>
+
+        <div class="reviews-pagination">
+            {{ $reviews->links() }}
+        </div>
     </div>
 @endsection

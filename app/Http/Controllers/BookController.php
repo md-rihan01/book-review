@@ -31,7 +31,8 @@ class BookController extends Controller
 
         // Create unique cache key per page
         $page = $request->get('page', 1);
-        $cacheKey = "books:{$filter}:{$title}:page:{$page}";
+        $cacheVersion = cache()->remember('books_listing_version', 3600, fn() => 1);
+        $cacheKey = "books:{$filter}:{$title}:page:{$page}:v{$cacheVersion}";
 
         $books = cache()->remember(
             $cacheKey,
@@ -66,7 +67,7 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id)
+    public function show(Request $request, int $id)
     {
         $cacheKey = 'book:' . $id;
 
@@ -74,12 +75,12 @@ class BookController extends Controller
             $cacheKey,
             3600,
             fn() =>
-            Book::with([
-                'reviews' => fn($query) => $query->latest()
-            ])->withAvgRating()->withReviewsCount()->findOrFail($id)
+            Book::withAvgRating()->withReviewsCount()->findOrFail($id)
         );
 
-        return view('books.show', ['book' => $book]);
+        $reviews = $book->reviews()->latest()->paginate(10);
+
+        return view('books.show', ['book' => $book, 'reviews' => $reviews]);
     }
 
     /**

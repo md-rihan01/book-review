@@ -16,10 +16,10 @@
     @php
         $filters = [
             '' => 'Latest',
-            'popular_last_mount' => 'Popular Last Month',
-            'popular_last_6mount' => 'Popular Last 6 Month',
-            'highest_rated_mount' => 'Highest Rated Last Month',
-            'highest_rated_6mount' => 'Highest Rated Last 6 Month',
+            'popular_last_month' => 'Popular Last Month',
+            'popular_last_6months' => 'Popular Last 6 Months',
+            'highest_rated_last_month' => 'Highest Rated Last Month',
+            'highest_rated_last_6months' => 'Highest Rated Last 6 Months',
         ];
     @endphp
 
@@ -43,7 +43,7 @@
                     <div class="d-flex flex-wrap justify-content-between align-items-center">
                         <div class="flex-grow-1">
                             <a href="{{ route('books.show', $book) }}" class="book-title">{{ $book->title }}</a>
-                            <span class="book-author">by {{ $book->author }}</span>
+                            <span class="book-author">by {{ $book->author_name }}</span>
                         </div>
                         <div class="text-end">
                             <div class="book-rating">
@@ -66,8 +66,9 @@
             </li>
         @endforelse
     </ul>
-
-    {{ $books->links() }}
+    <div class="books-pagination">
+        {{ $books->links() }}
+    </div>
 
 
 @endsection
